@@ -15,5 +15,5 @@ class Task(db.Model):
             "title": self.title,
             "description": self.description,
             "completed": self.completed,
-            "created_at": self.created_at
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }

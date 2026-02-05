@@ -40,5 +40,10 @@ def add_task():
 
     return jsonify({"message": "Task added"}), 201
 
+@app.route("/tasks", methods=["GET"])
+def view_tasks():
+    tasks = Task.query.all()
+    return jsonify([task.to_dict() for task in tasks]), 200
+
 if __name__ == "__main__":
     app.run(debug=True)
