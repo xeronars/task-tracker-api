@@ -1,8 +1,18 @@
 from flask import Flask, request, jsonify
 from models import db, Task
+import os
+from dotenv import load_dotenv
+import psycopg2
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tasks.db"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
+    f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
@@ -17,9 +27,12 @@ def home():
 def add_task():
     data = request.get_json()
 
+    if not data or not data.get("title"):
+        return jsonify({"error": "Title is required"}), 400
+    
     task = Task(
         title = data["title"],
-        description = data["description"]
+        description = data.get("description", "")
     )
 
     db.session.add(task)
